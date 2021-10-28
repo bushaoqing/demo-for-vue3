@@ -22,7 +22,7 @@ export default {
   name: 'App',
   setup() {
     const curRouters = computed(() => routes)
-    
+
     return {
       curRouters
     }
@@ -44,6 +44,10 @@ export default {
     border-radius: 4px;
     margin-right: 16px;
     box-sizing: border-box;
+  }
+
+  .app__router-link .app__router-link-items:hover {
+    background: yellow;
   }
 
   .app__center-box-wrap {
