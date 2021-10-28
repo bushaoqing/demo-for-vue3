@@ -15,13 +15,18 @@
 </template>
 
 <script>
+import { computed, onMounted } from 'vue'
 import { routes } from '@routers/index'
-import { computed } from '@vue/reactivity'
+import { loginCheck } from '@api/user'
 
 export default {
   name: 'App',
   setup() {
     const curRouters = computed(() => routes)
+
+    onMounted(() => {
+      loginCheck()
+    })
 
     return {
       curRouters

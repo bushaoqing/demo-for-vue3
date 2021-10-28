@@ -4,6 +4,8 @@
     "target": "es6",
     "paths": {
       "@pages/*": ["src/pages/*"],
+      "@api/*": ["src/api/*"],
+      "@common/*": ["src/common/*"],
       "@assets/*": ["src/assets/*"],
       "@routers/*": ["src/routers/*"],
       "@components/*": ["src/components/*"]
