@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "target": "es6",
+    "paths": {
+      "@pages/*": ["src/pages/*"],
+      "@assets/*": ["src/assets/*"],
+      "@routers/*": ["src/routers/*"],
+      "@components/*": ["src/components/*"]
+    }
+  },
+  "exclude": ["node_modules", "public"],
+  "include": ["src"]
+}
