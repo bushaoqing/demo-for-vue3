@@ -1,10 +1,19 @@
 <template>
-  <h1>{{ 'msg + a: ' + msg + a }}</h1>
-  <h2><span>userInfo: </span>{{ userInfo }}</h2>
-  <h2>{{ 'newInfo: '+ newInfo }}</h2>
-  <h2>{{ 'joinItems: '+ joinItems }}</h2>
-  <h2>{{ 'joinItemsWithPlu: '+ joinItemsWithPlu }}</h2>
-  <h2>{{ 'twoBars: '+ twoBars }}</h2>
+  <div :style="{
+    border: '1px solid red',
+    marginBottom: '16px'
+  }">
+    <h1>这里 Home 组件类容</h1>
+    <h1>{{ 'msg + a: ' + msg + a }}</h1>
+    <h2><span>userInfo: </span>{{ userInfo }}</h2>
+    <h2>{{ 'newInfo: '+ newInfo }}</h2>
+    <h2>{{ 'joinItems: '+ joinItems }}</h2>
+    <h2>{{ 'joinItemsWithPlu: '+ joinItemsWithPlu }}</h2>
+    <h2>{{ 'twoBars: '+ twoBars }}</h2>
+  </div>
+
+  <h1>这里 Home 子组件类容</h1>
+  <router-view />
 </template>
 
 <script>

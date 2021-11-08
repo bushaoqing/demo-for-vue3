@@ -18,7 +18,7 @@
         :class="`app__router-link-items ${currentNav === item.path ? 'current' : ''}`"
         v-for="(item, index) in curRouters" 
         :key="item.path" 
-        @click="() => onNavClick(item.path)"
+        @click="() => onNavClick(item)"
       >
         <router-link :to="item.path">{{ item.name }}</router-link>
       </div>
@@ -36,8 +36,18 @@
       height: `${mianHeight}px`
     }"
   >
-    <div :class="`app__center-box__left-menu ${isCloseVice ? 'is-close-vice' : ''}`">
-      left_menu
+    <div
+      v-if="Array.isArray(curRoutersChildren) && curRoutersChildren.length > 0"
+      :class="`app__center-box__left-menu ${isCloseVice ? 'is-close-vice' : ''}`"
+    >
+      <div 
+        :class="`app__router-link-items ${currentChildNav === item.path ? 'current' : ''}`"
+        v-for="(item, index) in curRoutersChildren" 
+        :key="item.path" 
+        @click="() => onChildNavClick(item)"
+      >
+        <router-link :to="item.path">{{ item.name }}</router-link>
+      </div>
     </div>
     <div 
       class="app__center-box__center-menu"
@@ -59,8 +69,10 @@ export default {
   name: 'App',
   setup() {
     const isCloseVice = ref(false)
-    const mianHeight = ref(window.innerHeight - 52)
+    const mianHeight = ref(window.innerHeight - 50)
     const currentNav = ref(_.get(routes, '[0].path'))
+    const curRoutersChildren = ref(_.get(routes, '[0].children'))
+    const currentChildNav = ref(_.get(curRoutersChildren, 'value.[0].path'))
     const curRouters = computed(() => routes)
 
     onMounted(() => {
@@ -72,8 +84,13 @@ export default {
       isCloseVice.value = !isCloseVice.value
     }
 
-    const onNavClick = path => {
-      currentNav.value = path
+    const onNavClick = (item = {}) => {
+      currentNav.value = item.path
+      curRoutersChildren.value = item.children || []
+    }
+
+    const onChildNavClick = (item = {}) => {
+      currentChildNav.value = item.path
     }
 
     return {
@@ -82,7 +99,10 @@ export default {
       isCloseVice,
       mianHeight,
       toogleViceNav,
-      onNavClick
+      onNavClick,
+      curRoutersChildren,
+      currentChildNav,
+      onChildNavClick,
     }
   }
 }
@@ -142,20 +162,36 @@ export default {
     box-sizing: border-box;
   }
 
-   .app__router-link .app__router-link-items.current a {
-     color: #31c193;
-   }
+  .app__router-link .app__router-link-items.current a {
+    color: #31c193;
+  }
 
   .app__router-link .app__router-link-items a {
     color: #a5bcc2;
+    user-select: none;
   }
 
   .app__router-link .app__router-link-items a:hover {
     color: #31c193;
   }
 
+  .app__center-box-wrap .app__center-box__left-menu .app__router-link-items {
+    line-height: 28px;
+    height: 28px;
+    padding-left: 16px;
+    box-sizing: border-box;
+  }
+
+  .app__center-box-wrap .app__center-box__left-menu .app__router-link-items a {
+    color: #a5bcc2;
+    user-select: none;
+  }
+
+  .app__center-box-wrap .app__center-box__left-menu .app__router-link-items.current a {
+    color: #31c193;
+  }
+
   .app__center-box-wrap {
-    border: 1px solid #eee;
     min-height: 600px;
     background: #e7eff4;
     display: flex;
@@ -163,7 +199,7 @@ export default {
 
   .app__center-box-wrap .app__center-box__left-menu {
     flex: 0 0 180px;
-    background: #a5bcc2;
+    background: #2a393c;
     max-width: 100%;
     transition: max-width 0.35s;
   }
