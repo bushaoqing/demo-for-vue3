@@ -6,21 +6,39 @@
         我是导航
       </span>
       <span
-        :class="`app__navigation vice-navigation ${isCloseVice ? 'is-close-vice' : ''}`"
+        :class="`app__navigation vice-navigation ${hideLeftMenu ? 'is-close-vice' : ''}`"
         @click="toogleViceNav"
       >
-        >
+        {{
+          showLeftMenu ? '>' : ''
+        }}
       </span>
     </div>
 
     <div class="app__navigation__center-wrap">
       <div 
-        :class="`app__router-link-items ${currentNav === item.path ? 'current' : ''}`"
+        :class="`app__router-link-items ${(currentMenu && currentMenu.indexOf(item.path) !== -1) ? 'current' : ''}`"
         v-for="(item, index) in curRouters" 
         :key="item.path" 
-        @click="() => onNavClick(item)"
+        @mouseenter="toogelShowNavMenu(item, true)"
+        @mouseleave="toogelShowNavMenu(item, false)"
+        @click="onNavClick(item.path)"
       >
-        <router-link :to="item.path">{{ item.name }}</router-link>
+        <router-link :to="`${item.path}/${item.children && item.children[0] && item.children[0].path || ''}`">{{ item.name }}</router-link>
+        
+        <div 
+          v-if="showCurrentNavMenu && item.children && item.children.length > 0"
+          class="app__router-link-items__nav-menu"
+        >
+          <div 
+            class="nav-items"
+            v-for="(nav, index) in item.children" 
+            :key="nav.path"
+            @click="onNavClick(item.path)"
+          >
+            <router-link :to="`${item.path}/${nav.path}`">{{ nav.name }}</router-link>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -29,80 +47,77 @@
     </div>
   </div>
   
-  <!-- 导航栏下面的主题部分 -->
+  <!-- 导航栏下面的主体部分 -->
   <div 
     class="app__center-box-wrap"
     :style="{
-      height: `${mianHeight}px`
+      minHeight: `${mainHeight}px`
     }"
   >
-    <div
-      v-if="Array.isArray(curRoutersChildren) && curRoutersChildren.length > 0"
-      :class="`app__center-box__left-menu ${isCloseVice ? 'is-close-vice' : ''}`"
-    >
-      <div 
-        :class="`app__router-link-items ${currentChildNav === item.path ? 'current' : ''}`"
-        v-for="(item, index) in curRoutersChildren" 
-        :key="item.path" 
-        @click="() => onChildNavClick(item)"
-      >
-        <router-link :to="item.path">{{ item.name }}</router-link>
-      </div>
-    </div>
-    <div 
-      class="app__center-box__center-menu"
-    >
-      <div class="app__center-box__center-menu-wrap">
-        <router-view></router-view>
-      </div>
-    </div>
+    <router-view />
   </div>
 </template>
 
 <script>
 import { computed, onMounted, ref } from 'vue'
+import _ from 'lodash'
+import { useStore } from 'vuex'
 import { routes } from '@routers/index'
 import { loginCheck } from '@api/user'
-import _ from 'lodash'
 
 export default {
   name: 'App',
   setup() {
-    const isCloseVice = ref(false)
-    const mianHeight = ref(window.innerHeight - 50)
-    const currentNav = ref(_.get(routes, '[0].path'))
-    const curRoutersChildren = ref(_.get(routes, '[0].children'))
-    const currentChildNav = ref(_.get(curRoutersChildren, 'value.[0].path'))
+    const store = useStore()
+    const mainHeight = ref(window.innerHeight - 50)
+    const showCurrentNavMenu = ref(false)
+    const currentMenu = ref(null)
     const curRouters = computed(() => routes)
+    const showLeftMenu = computed(() => store.state.menu.hasLeftMenu)
+    const hideLeftMenu = computed(() => store.state.menu.closeLeftMenu)
 
     onMounted(() => {
       loginCheck()
+
+      initData()
     })
 
+    const initData = () => {
+      const pathName = location.pathname
+
+      // 手动刷新（F5）后，需要将一级目录高亮显示
+      if (pathName) {
+        currentMenu.value = pathName
+      }
+    }
+
     const toogleViceNav = () => {
-      console.log('toogleViceNav: ', isCloseVice.value);
-      isCloseVice.value = !isCloseVice.value
+      store.commit('menu/updateCloseLeftMenu', {
+        closeLeftMenu: !hideLeftMenu.value
+      })
     }
 
-    const onNavClick = (item = {}) => {
-      currentNav.value = item.path
-      curRoutersChildren.value = item.children || []
+    const toogelShowNavMenu = (item = {}, bool = false) => {
+      const children = _.get(item, 'children')
+      if (!_.isArray(children)) bool = false
+      showCurrentNavMenu.value = bool
     }
 
-    const onChildNavClick = (item = {}) => {
-      currentChildNav.value = item.path
+    const onNavClick = (path = '') => {
+      currentMenu.value = path
+      showCurrentNavMenu.value = false
     }
 
     return {
-      currentNav,
       curRouters,
-      isCloseVice,
-      mianHeight,
+      hideLeftMenu,
+      mainHeight,
       toogleViceNav,
+      toogelShowNavMenu,
+      showCurrentNavMenu,
       onNavClick,
-      curRoutersChildren,
-      currentChildNav,
-      onChildNavClick,
+      currentMenu,
+      showLeftMenu,
     }
   }
 }
@@ -112,7 +127,6 @@ export default {
   .app__router-link {
     line-height: 42px;
     display: flex;
-    /* justify-content: center; */
     background: #1e2224;
     color: #a5bcc2;
   }
@@ -136,6 +150,7 @@ export default {
     vertical-align: top;
     transition: all 0.3s;
     transform-origin: center;
+    user-select: none;
   }
 
   .app__router-link .app__navigation__center-wrap {
@@ -160,9 +175,11 @@ export default {
     border-radius: 4px;
     margin-right: 16px;
     box-sizing: border-box;
+    position: relative;
   }
 
-  .app__router-link .app__router-link-items.current a {
+  .app__router-link .app__router-link-items.current > a, 
+  .app__router-link .app__router-link-items > a.router-link-active {
     color: #31c193;
   }
 
@@ -171,53 +188,43 @@ export default {
     user-select: none;
   }
 
+  .app__navigation.vice-navigation {
+    width: 12px;
+  }
+
   .app__router-link .app__router-link-items a:hover {
-    color: #31c193;
-  }
-
-  .app__center-box-wrap .app__center-box__left-menu .app__router-link-items {
-    line-height: 28px;
-    height: 28px;
-    padding-left: 16px;
-    box-sizing: border-box;
-  }
-
-  .app__center-box-wrap .app__center-box__left-menu .app__router-link-items a {
-    color: #a5bcc2;
-    user-select: none;
-  }
-
-  .app__center-box-wrap .app__center-box__left-menu .app__router-link-items.current a {
     color: #31c193;
   }
 
   .app__center-box-wrap {
     min-height: 600px;
     background: #e7eff4;
-    display: flex;
   }
 
-  .app__center-box-wrap .app__center-box__left-menu {
-    flex: 0 0 180px;
-    background: #2a393c;
-    max-width: 100%;
-    transition: max-width 0.35s;
+  .app__router-link .app__router-link-items__nav-menu {
+    position: absolute;
+    top: 50px;
+    width: 90px;
+    background: #333;
   }
 
-  .app__center-box-wrap .app__center-box__left-menu.is-close-vice {
-    max-width: 0;
-    overflow: hidden;
+  .app__router-link .app__router-link-items__nav-menu .nav-items {
+    padding-left: 8px;
+    cursor: pointer;
   }
 
-  .app__center-box-wrap .app__center-box__center-menu {
-    flex: 1 1 auto;
-    display: inline-flex;
-    justify-content: center;
+  .app__router-link .app__router-link-items__nav-menu .nav-items > a {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
   }
 
-  .app__center-box-wrap .app__center-box__center-menu-wrap {
-    width: 1280px;
-    margin: 20px 0;
-    border: 1px solid pink;
+  .app__router-link .app__router-link-items__nav-menu .nav-items > a.router-link-active {
+    color: #31c193;
+  }
+
+  .app__router-link .app__router-link-items__nav-menu .nav-items:hover {
+    background: lightslategray;
+    color: #fff;
   }
 </style>

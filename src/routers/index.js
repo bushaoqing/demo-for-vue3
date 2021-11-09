@@ -11,19 +11,22 @@ export const routes = [
     path: '/home',
     name: 'Go home',
     component: Home,
-    children: [ // 嵌套路由置灰出现在对应父组件(此处是Home组件)的 <router-view /> 中
+    children: [
       {
-        path: '/toC',
+        path: 'toC',
         name: 'to c',
         component: C
       }, {
-        path: '/toD',
+        path: 'toD',
         name: 'to d',
         component: D
       }, {
-        path: '/toE',
+        path: 'toE',
         name: 'to e',
-        component: E
+        component: E,
+        // meta: {
+        //   priv: 0
+        // }
       }
     ]
   }, {

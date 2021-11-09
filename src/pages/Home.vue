@@ -1,27 +1,33 @@
 <template>
-  <div :style="{
-    border: '1px solid red',
-    marginBottom: '16px'
-  }">
-    <h1>这里 Home 组件类容</h1>
-    <h1>{{ 'msg + a: ' + msg + a }}</h1>
-    <h2><span>userInfo: </span>{{ userInfo }}</h2>
-    <h2>{{ 'newInfo: '+ newInfo }}</h2>
-    <h2>{{ 'joinItems: '+ joinItems }}</h2>
-    <h2>{{ 'joinItemsWithPlu: '+ joinItemsWithPlu }}</h2>
-    <h2>{{ 'twoBars: '+ twoBars }}</h2>
-  </div>
+  <page-wrap>
+    <div :style="{
+      border: '1px solid red',
+      marginBottom: '16px'
+    }">
+      <h1>这里 Home 组件类容</h1>
+      <h1>{{ 'msg + a: ' + msg + a }}</h1>
+      <h2><span>userInfo: </span>{{ userInfo }}</h2>
+      <h2>{{ 'newInfo: '+ newInfo }}</h2>
+      <h2>{{ 'joinItems: '+ joinItems }}</h2>
+      <h2>{{ 'joinItemsWithPlu: '+ joinItemsWithPlu }}</h2>
+      <h2>{{ 'twoBars: '+ twoBars }}</h2>
+    </div>
 
-  <h1>这里 Home 子组件类容</h1>
-  <router-view />
+    <h1>这里 Home 子组件类容</h1>
+    <router-view />
+  </page-wrap>
 </template>
 
 <script>
 import { watch } from 'vue'
 import { useStore, mapState, mapGetters } from 'vuex'
+import PageWrap from '@components/PageWrap/index.vue'
 
 export default {
   name: 'Home',
+  components: {
+    'page-wrap': PageWrap
+  },
 
   // TODO：后续vuex官方应该会对setup写法出对应的映射方案，就不用使用vue2的写法，毕竟setup中无法获取computed中的值
   // 使用 mapState, mapGetters 映射写法
@@ -43,8 +49,7 @@ export default {
     })
   },
 
-  setup() {
-
+  setup(props) {
     const store = useStore()
 
     // 不使用 mapState, mapGetters 映射写法
