@@ -24,7 +24,9 @@
 
     <div class="components__pagewrap-rightbody-wrap">
       <div class="center">
-        <component :is="curCom" />
+        <keep-alive>
+          <component :is="curCom" />
+        </keep-alive>
       </div>
     </div>
   </div>
