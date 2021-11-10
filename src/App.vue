@@ -6,12 +6,14 @@
         我是导航
       </span>
       <span
-        :class="`app__navigation vice-navigation ${hideLeftMenu ? 'is-close-vice' : ''}`"
+        :class="
+          `app__navigation vice-navigation 
+          ${hideLeftMenu ? 'is-close-vice' : ''}
+          ${showLeftMenu ? 'show-left-menu' : ''}
+          `
+        "
         @click="toogleViceNav"
       >
-        {{
-          showLeftMenu ? '>' : ''
-        }}
       </span>
     </div>
 
@@ -163,7 +165,7 @@ export default {
   }
 
   .app__router-link .app__navigation.vice-navigation.is-close-vice {
-    transform: rotate(180deg);
+    transform: rotate(90deg);
   }
 
   .app__router-link .app__navigation.vice-navigation:hover {
@@ -226,5 +228,9 @@ export default {
   .app__router-link .app__router-link-items__nav-menu .nav-items:hover {
     background: lightslategray;
     color: #fff;
+  }
+
+  .app__navigation.vice-navigation.show-left-menu {
+    background: url('./assets/expend.png') no-repeat center;
   }
 </style>
